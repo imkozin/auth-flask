@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 function App() {
-  const [data, setData] = useState([{}])
+  const [users, setUsers] = useState([{}])
 
   useEffect(() => {
     const getUsers = async() => {
@@ -10,7 +10,7 @@ function App() {
         if (response.ok) {
           const data = await response.json()
           const userList = data.users
-          setData(userList)
+          setUsers(userList)
         } else {
           console.error('Error fetching user data:', response.statusText)
         }
@@ -25,9 +25,9 @@ function App() {
 
   return (
     <div>
-      {data.map((user, i) => {
+      {users.map((user) => {
         return (
-          <div key={i}>
+          <div key={user.id}>
             <p>Email: {user.email}</p>
             <p>Organization ID: {user.organization_id}</p>
           </div>

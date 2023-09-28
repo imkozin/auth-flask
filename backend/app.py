@@ -2,11 +2,8 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, create_access_token
 from werkzeug.security import generate_password_hash, check_password_hash
-# config data from config.py
-# from config import Config
 # migrate
 from flask_migrate import Migrate
-import os
 from sqlalchemy import text
 
 
@@ -26,7 +23,6 @@ def test_db_connection():
         return "Database connection is working."
     except Exception as e:
         return f"Error: {str(e)}"
-
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -95,4 +91,4 @@ def get_users():
 
     
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
