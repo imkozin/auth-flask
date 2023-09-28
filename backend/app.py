@@ -87,12 +87,12 @@ def get_users():
             'id': user.id,
             'email': user.email,
             'organization_id': user.organization_id
-            # Add more user attributes as needed
         }
         user_list.append(user_data)
 
     # Return the user data in JSON format
     return jsonify({'users': user_list})
 
+    
 if __name__ == '__main__':
     app.run(debug=True)
