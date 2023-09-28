@@ -19,8 +19,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ivankozin:2158310@localhos
 db = SQLAlchemy(app)
 
 
-# migrate = Migrate(app, db)
-
 @app.route('/test_db_connection')
 def test_db_connection():
     try:
@@ -43,7 +41,7 @@ class Organization(db.Model):
 
 migrate = Migrate(app, db)
 
-# jwt = JWTManager(app)
+jwt = JWTManager(app)
 
 # @app.route("/token", methods=["POST"])
 # def create_token():
@@ -55,7 +53,46 @@ migrate = Migrate(app, db)
 #     access_token = create_access_token(identity=email)
 #     return jsonify(access_token=access_token)
 
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+    new_user = User(email=data['email'], password=hashed_password)  # Modified here
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "User created!"}), 201
 
+# @app.route('/signin', methods=['POST'])
+# def signin():
+#     data = request.get_json()
+#     user = User.query.filter_by(email=data['email']).first()  # Modified here
+#     # tests log
+#     print("Req data =>", data)
+#     print("DB query user", user)
+    
+#     if not user or not check_password_hash(user.password, data['password']):
+#         return jsonify({"message": "Invalid credentials!"}), 401
+#     access_token = create_access_token(identity=user.email)  # Use email as identity
+#     return jsonify({"access_token": access_token})
+
+@app.route('/users', methods=['GET'])
+def get_users():
+    # Query the database to retrieve user data
+    users = User.query.all()
+
+    # Convert the user data to a list of dictionaries
+    user_list = []
+    for user in users:
+        user_data = {
+            'id': user.id,
+            'email': user.email,
+            'organization_id': user.organization_id
+            # Add more user attributes as needed
+        }
+        user_list.append(user_data)
+
+    # Return the user data in JSON format
+    return jsonify({'users': user_list})
 
 if __name__ == '__main__':
     app.run(debug=True)
