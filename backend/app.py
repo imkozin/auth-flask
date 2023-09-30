@@ -31,6 +31,7 @@ def test_db_connection():
         return f"Error: {str(e)}"
 
 
+# class represent a table in database
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), unique=True, nullable=False)
@@ -42,33 +43,25 @@ class Organization(db.Model):
     name = db.Column(db.String(100), nullable=False)
     employees = db.relationship(User, backref='organization', lazy=True)
 
+
 migrate = Migrate(app, db)
 
 jwt = JWTManager(app)
 
-# @app.route("/token", methods=["POST"])
-# def create_token():
-#     email = request.json.get("email", None)
-#     password = request.json.get("password", None)
-#     if email != "test" or password != "test":
-#         return jsonify({"msg": "Bad email or password"}), 401
-
-#     access_token = create_access_token(identity=email)
-#     return jsonify(access_token=access_token)
 
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
-    user_exists = User.query.filter_by(email=data['email']) is not None
+    user_exists = User.query.filter_by(email=data['email']).first()
 
     if user_exists:
-        pass
+        return jsonify({"error": "Email is already registered"}), 400
 
     hashed_password = generate_password_hash(data['password'], method='sha256')
     new_user = User(email=data['email'], password=hashed_password)  # Modified here
     db.session.add(new_user)
     db.session.commit()
-    return jsonify({"message": "User created!"}), 201
+    return jsonify({"message": "User registered successfully"}), 200
 
 @app.route('/signin', methods=['POST'])
 def signin():
@@ -78,8 +71,11 @@ def signin():
     print("Req data =>", data)
     print("DB query user", user)
     
-    if not user or not check_password_hash(user.password, data['password']):
-        return jsonify({"message": "Invalid credentials!"}), 401
+    if user is None:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not check_password_hash(user.password, data['password']):
+        return jsonify({"error": "Invalid credentials!"}), 401
     access_token = create_access_token(identity=user.email)  # Use email as identity
     return jsonify({"access_token": access_token})
 
