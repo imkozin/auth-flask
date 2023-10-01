@@ -1,46 +1,148 @@
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import AppBar from '@mui/material/AppBar'
+import Box from '@mui/material/Box'
+import CssBaseline from '@mui/material/CssBaseline'
+import Divider from '@mui/material/Divider'
+import Drawer from '@mui/material/Drawer'
+import IconButton from '@mui/material/IconButton'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemText from '@mui/material/ListItemText'
+import MenuIcon from '@mui/icons-material/Menu'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+
+const drawerWidth = 240
+const tabs = [
+  { name: 'Team', path: '/users', authRequired: true },
+  { name: 'Logout', authRequired: true},
+  { name: 'Login', path: '/login', authRequired: false },
+  { name: 'Register', path: '/register', authRequired: false },
+]
+
 function Navbar(props) {
-  
+  const { window } = props
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('access_token')
+    token ? setIsLoggedIn(true) : setIsLoggedIn(false)
+  }, [location])
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('access_token')
+    setIsLoggedIn(false)
+    navigate('/login')
+  }
+
+  const handleDrawerToggle = () => {
+    setMobileOpen((prevState) => !prevState)
+  }
+
+  const drawer = (
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+      <Typography variant="h6" sx={{ my: 2 }}>
+        IvanTech
+      </Typography>
+      <Divider />
+      <List>
+        {tabs.map((tab, id) => {
+          if (
+            (tab.authRequired && isLoggedIn) ||
+            (!tab.authRequired && !isLoggedIn)
+          ) {
+            return (
+              <ListItem key={id} disablePadding>
+                <ListItemButton sx={{ textAlign: 'center' }}>
+                  <Link
+                    to={tab.path}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
+                    <ListItemText primary={tab.name} />
+                  </Link>
+                </ListItemButton>
+              </ListItem>
+            )
+          }
+          return null // Hide the tab
+        })}
+      </List>
+    </Box>
+  )
+
+  const container =
+    window !== undefined ? () => window().document.body : undefined
 
   return (
-    <header class="text-gray-600 body-font bg-blue-500">
-      <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-        <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-          <svg
-            src="./logo.jpeg"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            class="w-10 h-10 text-white p-2 bg-blue-500 rounded-full"
-            viewBox="0 0 24 24"
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar component="nav">
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { sm: 'none' } }}
           >
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-          </svg>
-          <span class="ml-3 text-xl">IvanTech</span>
-        </a>
-        <nav class="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-400	flex flex-wrap items-center text-base justify-center">
-          <a class="mr-5 hover:text-gray-900">First Link</a>
-          <a class="mr-5 hover:text-gray-900">Second Link</a>
-          <a class="mr-5 hover:text-gray-900">Third Link</a>
-          <a class="mr-5 hover:text-gray-900">Fourth Link</a>
-        </nav>
-        <button class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0">
-          Button
-          <svg
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            class="w-4 h-4 ml-1"
-            viewBox="0 0 24 24"
+            <MenuIcon />
+          </IconButton>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
           >
-            <path d="M5 12h14M12 5l7 7-7 7"></path>
-          </svg>
-        </button>
-      </div>
-    </header>
+            IvanTech
+          </Typography>
+          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            {tabs.map((tab, id) => {
+              if (
+                (tab.authRequired && isLoggedIn) ||
+                (!tab.authRequired && !isLoggedIn)
+              ) {
+                return (
+                  <Button key={id} sx={{ color: '#fff' }}>
+                    {tab.path ? (
+                      <Link to={tab.path}>{tab.name}</Link>
+                    ) : (
+                      <Button onClick={handleLogout}>{tab.label}</Button>
+                    )}
+                  </Button>
+                )
+              }
+              return null // Hide the tab
+            })}
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <nav>
+        <Drawer
+          container={container}
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: drawerWidth,
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </nav>
+    </Box>
   )
 }
 
