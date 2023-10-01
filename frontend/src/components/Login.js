@@ -36,7 +36,7 @@ const Login = () => {
         if (res.status === 200) {
             const { access_token } = data;
 
-            sessionStorage.setItem('access_token', access_token)
+            localStorage.setItem('access_token', access_token)
             navigate('/users');
         } else {
             setError(data.error)

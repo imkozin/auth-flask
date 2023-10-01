@@ -16,12 +16,6 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 
 const drawerWidth = 240
-const tabs = [
-  { name: 'Team', path: '/users', authRequired: true },
-  { name: 'Logout', authRequired: true},
-  { name: 'Login', path: '/login', authRequired: false },
-  { name: 'Register', path: '/register', authRequired: false },
-]
 
 function Navbar(props) {
   const { window } = props
@@ -32,15 +26,18 @@ function Navbar(props) {
   const location = useLocation()
 
   useEffect(() => {
-    const token = sessionStorage.getItem('access_token')
+    const token = localStorage.getItem('access_token')
+    console.log('Token:', token)
     token ? setIsLoggedIn(true) : setIsLoggedIn(false)
   }, [location])
 
   const handleLogout = () => {
-    sessionStorage.removeItem('access_token')
+    localStorage.removeItem('access_token')
     setIsLoggedIn(false)
     navigate('/login')
   }
+
+
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState)
@@ -53,26 +50,53 @@ function Navbar(props) {
       </Typography>
       <Divider />
       <List>
-        {tabs.map((tab, id) => {
-          if (
-            (tab.authRequired && isLoggedIn) ||
-            (!tab.authRequired && !isLoggedIn)
-          ) {
-            return (
-              <ListItem key={id} disablePadding>
-                <ListItemButton sx={{ textAlign: 'center' }}>
-                  <Link
-                    to={tab.path}
-                    style={{ textDecoration: 'none', color: 'inherit' }}
-                  >
-                    <ListItemText primary={tab.name} />
-                  </Link>
-                </ListItemButton>
-              </ListItem>
-            )
-          }
-          return null // Hide the tab
-        })}
+        {isLoggedIn ? (
+          <>
+            <ListItem disablePadding>
+              <ListItemButton sx={{ textAlign: 'center' }}>
+                <Link
+                  to={'/users'}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <ListItemText primary="Team" />
+                </Link>
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton sx={{ textAlign: 'center' }}>
+                <Link
+                  onClick={handleLogout}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <ListItemText primary="Logout" />
+                </Link>
+              </ListItemButton>
+            </ListItem>
+          </>
+        ) : (
+          <>
+            <ListItem disablePadding>
+              <ListItemButton sx={{ textAlign: 'center' }}>
+                <Link
+                  to={'/login'}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <ListItemText primary="Login" />
+                </Link>
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton sx={{ textAlign: 'center' }}>
+                <Link
+                  to={'/register'}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <ListItemText primary="Register" />
+                </Link>
+              </ListItemButton>
+            </ListItem>
+          </>
+        )}
       </List>
     </Box>
   )
@@ -102,23 +126,29 @@ function Navbar(props) {
             IvanTech
           </Typography>
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            {tabs.map((tab, id) => {
-              if (
-                (tab.authRequired && isLoggedIn) ||
-                (!tab.authRequired && !isLoggedIn)
-              ) {
-                return (
-                  <Button key={id} sx={{ color: '#fff' }}>
-                    {tab.path ? (
-                      <Link to={tab.path}>{tab.name}</Link>
-                    ) : (
-                      <Button onClick={handleLogout}>{tab.label}</Button>
-                    )}
-                  </Button>
-                )
-              }
-              return null // Hide the tab
-            })}
+            {isLoggedIn ? (
+              <>
+                <Button component={Link} to={'/users'} sx={{ color: '#fff' }}>
+                  Team
+                </Button>
+                <Button onClick={handleLogout} sx={{ color: '#fff' }}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button component={Link} to={'/login'} sx={{ color: '#fff' }}>
+                  Login
+                </Button>
+                <Button
+                  component={Link}
+                  to={'/register'}
+                  sx={{ color: '#fff' }}
+                >
+                  Register
+                </Button>
+              </>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
