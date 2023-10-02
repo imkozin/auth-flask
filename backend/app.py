@@ -39,8 +39,8 @@ class User(db.Model):
 
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
-    employees = db.relationship(User, backref='organization', lazy=True)
+    title = db.Column(db.String(100), unique=True, nullable=False)
+    employees = db.relationship(User, backref='organization', lazy=True, cascade='all, delete-orphan')
 
 
 migrate = Migrate(app, db)
@@ -48,93 +48,93 @@ migrate = Migrate(app, db)
 jwt = JWTManager(app)
 
 
-# @app.route('/signup', methods=['POST'])
-# def signup():
-#     data = request.get_json()
-#     user_exists = User.query.filter_by(email=data['email']).first()
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    user_exists = User.query.filter_by(email=data['email']).first()
 
-#     if user_exists:
-#         return jsonify({"error": "Email is already registered"}), 400
+    if user_exists:
+        return jsonify({"error": "Email is already registered"}), 400
 
-#     hashed_password = generate_password_hash(data['password'], method='sha256')
-#     new_user = User(email=data['email'], password=hashed_password)  # Modified here
-#     db.session.add(new_user)
-#     db.session.commit()
-#     return jsonify({"message": "User registered successfully"}), 200
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+    new_user = User(email=data['email'], password=hashed_password)  # Modified here
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "User registered successfully"}), 200
 
-# @app.route('/signin', methods=['POST'])
-# def signin():
-#     data = request.get_json()
-#     user = User.query.filter_by(email=data['email']).first()  # Modified here
-#     # tests log
-#     print("Req data =>", data)
-#     print("DB query user", user)
+@app.route('/signin', methods=['POST'])
+def signin():
+    data = request.get_json()
+    user = User.query.filter_by(email=data['email']).first()  # Modified here
+    # tests log
+    print("Req data =>", data)
+    print("DB query user", user)
     
-#     if user is None:
-#         return jsonify({"error": "Unauthorized"}), 401
+    if user is None:
+        return jsonify({"error": "Unauthorized"}), 401
 
-#     if not check_password_hash(user.password, data['password']):
-#         return jsonify({"error": "Invalid credentials!"}), 401
-#     access_token = create_access_token(identity=user.email)  # Use email as identity
-#     return jsonify({"access_token": access_token})
+    if not check_password_hash(user.password, data['password']):
+        return jsonify({"error": "Invalid credentials!"}), 401
+    access_token = create_access_token(identity=user.email)  # Use email as identity
+    return jsonify({"access_token": access_token})
 
-# @app.route('/users', methods=['GET'])
-# def get_users():
-#     # Query the database to retrieve user data
-#     users = User.query.all()
+@app.route('/users', methods=['GET'])
+def get_users():
+    # Query the database to retrieve user data
+    users = User.query.all()
 
-#     # Convert the user data to a list of dictionaries
-#     user_list = []
-#     for user in users:
-#         user_data = {
-#             'id': user.id,
-#             'email': user.email,
-#             'organization_id': user.organization_id
-#         }
-#         user_list.append(user_data)
+    # Convert the user data to a list of dictionaries
+    user_list = []
+    for user in users:
+        user_data = {
+            'id': user.id,
+            'email': user.email,
+            'organization_id': user.organization_id
+        }
+        user_list.append(user_data)
 
-#     # Return the user data in JSON format
-#     return jsonify({'users': user_list})
+    # Return the user data in JSON format
+    return jsonify({'users': user_list})
 
 
-# @app.route('/create-org', methods=['POST'])
-# def add_organization():
-#     data = request.get_json()
-#     new_organization = Organization(name=data['name'])
+@app.route('/create-org', methods=['POST'])
+def add_organization():
+    data = request.get_json()
+    new_organization = Organization(title=data['title'])
 
-#     db.session.add(new_organization)
-#     db.session.commit()
-#     return jsonify({"message": "Organization created!"}), 201
+    db.session.add(new_organization)
+    db.session.commit()
+    return jsonify({"message": "Organization created!"}), 201
 
-# @app.route('/delete-org/<int:id>', methods=['DELETE'])
-# def delete_organization(id):
-#     organization = Organization.query.get(id)
+@app.route('/delete-org/<int:id>', methods=['DELETE'])
+def delete_organization(id):
+    organization = Organization.query.get(id)
 
-#     if organization is not None:
-#         db.session.delete(organization)
-#         db.session.commit()
-#         return jsonify({"message": "Organization deleted successfully!"}), 200
-#     else:
-#         return jsonify({"message": "Organization not found"}), 404
+    if organization is not None:
+        db.session.delete(organization)
+        db.session.commit()
+        return jsonify({"message": "Organization deleted successfully!"}), 200
+    else:
+        return jsonify({"message": "Organization not found"}), 404
 
-# @app.route('/orgs', methods=['GET'])
-# def get_organizations():
-#     organizations = Organization.query.all()
-#     org_list = []
+@app.route('/orgs', methods=['GET'])
+def get_organizations():
+    organizations = Organization.query.all()
+    org_list = []
 
-#     for org in organizations:
-#         org_list.append({'title' : org.title, 'employees' : [user.email for user in org.employees]})
-#     return jsonify({'organizations': org_list})
+    for org in organizations:
+        org_list.append({'id': org.id, 'title' : org.title, 'employees' : [user.email for user in org.employees]})
+    return jsonify({'organizations': org_list})
   
 
-# @app.route('/add-user-to-org', methods=['POST'])
-# def add_user():
-#     data = request.get_json()
-#     new_user = User(email=data['email'], password=data['password'], organization_id=data['organization_id'])
+@app.route('/add-user-to-org', methods=['POST'])
+def add_user():
+    data = request.get_json()
+    new_user = User(email=data['email'], password=data['password'], organization_id=data['organization_id'])
 
-#     db.session.add(new_user)
-#     db.session.commit()
-#     return jsonify({"message": "User added!"}), 201
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "User added!"}), 201
 
     
 if __name__ == '__main__':
