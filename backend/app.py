@@ -11,7 +11,6 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-
 # create the app
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
@@ -40,7 +39,7 @@ class User(db.Model):
 
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
     employees = db.relationship(User, backref='organization', lazy=True)
 
 
@@ -101,7 +100,7 @@ def get_users():
 @app.route('/create-org', methods=['POST'])
 def add_organization():
     data = request.get_json()
-    new_organization = Organization(name=data['name'])
+    new_organization = Organization(title=data['title'])
 
     db.session.add(new_organization)
     db.session.commit()
@@ -113,7 +112,7 @@ def get_organizations():
     org_list = []
 
     for org in organizations:
-        org_list.append({'name' : org.name, 'employees' : [user.email for user in org.employees]})
+        org_list.append({'title' : org.title, 'employees' : [user.email for user in org.employees]})
     return jsonify({'organizations': org_list})
   
 

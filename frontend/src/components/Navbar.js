@@ -55,6 +55,16 @@ function Navbar(props) {
             <ListItem disablePadding>
               <ListItemButton sx={{ textAlign: 'center' }}>
                 <Link
+                  to={'/form'}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <ListItemText primary="Organization" />
+                </Link>
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton sx={{ textAlign: 'center' }}>
+                <Link
                   to={'/users'}
                   style={{ textDecoration: 'none', color: 'inherit' }}
                 >
@@ -138,6 +148,9 @@ function Navbar(props) {
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {isLoggedIn ? (
               <>
+                <Button component={Link} to={'/form'} sx={{ color: '#fff' }}>
+                  Organization
+                </Button>
                 <Button component={Link} to={'/users'} sx={{ color: '#fff' }}>
                   Team
                 </Button>
