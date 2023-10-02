@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import Snackbar from '@mui/material/Snackbar'
-import Alert from "@mui/material/Alert";
+import { Button, Alert, Snackbar } from "@mui/material";
 
 function Form() {
     const [organizations, setOrganizations] = useState([{}])
@@ -36,7 +35,7 @@ function Form() {
         }
      }
      getOrganizations()   
-    }, [organizations])
+    }, [])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -61,6 +60,25 @@ function Form() {
         }
     }
 
+    const handleDelete = async (id) => {
+        try {
+            const res = await fetch(`/delete-org/${id}`, {
+                method: 'DELETE'
+            })
+
+            if (res.status === 200) {
+                setOrganizations((prevOrganizations) => prevOrganizations.filter((org) => org.id !== id))
+                setSuccess(true)
+                handleClick()
+            }
+            else {
+                console.error('Failed to delete organization:', res.status);
+            }
+        } catch (err) {
+            console.error('Network error:', err);
+        }
+    }
+
     return (
       <>
         {success && (
@@ -70,7 +88,7 @@ function Form() {
               severity="success"
               sx={{ width: '100%' }}
             >
-              This is a success message!
+              Organization created successfully!
             </Alert>
           </Snackbar>
         )}
@@ -103,6 +121,21 @@ function Form() {
                     className="w-full bg-gray-100 bg-opacity-50 rounded focus:ring-2 focus:ring-blue-200 focus:bg-transparent border border-gray-300 focus:border-blue-500 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                   />
                 </div>
+                {success && (
+                  <Snackbar
+                    open={open}
+                    autoHideDuration={6000}
+                    onClose={handleClose}
+                  >
+                    <Alert
+                      onClose={handleClose}
+                      severity="success"
+                      sx={{ width: '100%' }}
+                    >
+                      Organization deleted successfully!
+                    </Alert>
+                  </Snackbar>
+                )}
                 <button
                   className="inline-flex text-white bg-blue-500 border-0 py-2 px-6 focus:outline-none hover:bg-blue-600 rounded text-lg"
                   onClick={handleSubmit}
@@ -139,6 +172,13 @@ function Form() {
                         </h2>
                         <p class="text-gray-500">{}</p>
                       </div>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleDelete(org.id)}
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 )

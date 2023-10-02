@@ -135,7 +135,7 @@ const Login = () => {
               Not a member?{' '}
               <Link
                 to={`/register`}
-                className="font-semibold leading-6 text-blue-600 hover:text-blue-500"
+                className="font-semibold leading-6 text-blue-600 hover:text-sky-500"
               >
                 Create an account
               </Link>
