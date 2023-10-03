@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import { Button, Alert, Snackbar } from "@mui/material";
+import { OrganizationContext } from "./OrganizationContext";
 
-function Form() {
-    const [organizations, setOrganizations] = useState([{}]);
+function Organization() {
+    const { organizations, setOrganizations, refresh, setRefresh } =
+      useContext(OrganizationContext)
     const [open, setOpen] = useState(false);
     const [org, setOrg] = useState(''); // organization title name
     const [success, setSuccess] = useState(false);
-    const [refresh, setRefresh] = useState(false);
 
     const handleClick = () => {
       setOpen(true)
@@ -18,25 +19,6 @@ function Form() {
       }
       setOpen(false)
     }
-
-    useEffect(() => {
-     const getOrganizations = async () => {
-       try {
-         const res = await fetch('/orgs')
-         if (res.ok) {
-           const data = await res.json()
-           const organizationList = data.organizations
-           setOrganizations(organizationList)
-           console.log(organizationList);
-         } else {
-           console.error('Error fetching user data:', res.statusText)
-         }
-        } catch (err) {
-            console.log('Error:', err)
-        }
-     }
-     getOrganizations()   
-    }, [refresh])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -158,11 +140,35 @@ function Form() {
                           {org.title}
                         </h2>
                         <div className="mb-4">
-                          <ul>
-                            <li>John Doe</li>
-                            <li>John Doe</li>
-                            <li>John Doe</li>
-                          </ul>
+                          {org.employees && org.employees.length > 0 ? (
+                            org.employees.map((employee, index) => (
+                              <p
+                                key={index}
+                                className="flex items-center text-gray-600 mb-2"
+                              >
+                                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-blue-400 text-white rounded-full flex-shrink-0">
+                                  <svg
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2.5"
+                                    className="w-3 h-3"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M20 6L9 17l-5-5"></path>
+                                  </svg>
+                                </span>
+                                {employee}
+                              </p>
+                            ))
+                          ) : (
+                            <p className="text-gray-600 mb-2">
+                              <span >
+                                No employees yet
+                              </span>
+                            </p>
+                          )}
                         </div>
                       </div>
                       <Button
@@ -173,8 +179,8 @@ function Form() {
                         Delete
                       </Button>
                     </div>
-                  </div>
-                )
+                  </div> 
+                ) 
               })}
             </div>
           </div>
@@ -183,4 +189,4 @@ function Form() {
     )
 }
 
-export default Form;
+export default Organization;

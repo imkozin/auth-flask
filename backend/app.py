@@ -31,6 +31,18 @@ def test_db_connection():
 
 
 # class represent a table in database
+# class User(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     email = db.Column(db.String(80), unique=True, nullable=False)
+#     password = db.Column(db.String(1000), nullable=False)
+#     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=True)
+#     organization = db.relationship('Organization', backref='employees')
+
+# class Organization(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     title = db.Column(db.String(100), unique=True, nullable=False)
+#     employees = db.relationship(User, backref='organization', lazy=True, cascade='save-update')
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), unique=True, nullable=False)
@@ -40,7 +52,7 @@ class User(db.Model):
 class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), unique=True, nullable=False)
-    employees = db.relationship(User, backref='organization', lazy=True, cascade='all, delete-orphan')
+    employees = db.relationship(User, backref='organization', lazy=True, cascade='save-update') 
 
 
 migrate = Migrate(app, db)
@@ -78,6 +90,7 @@ def signin():
     access_token = create_access_token(identity=user.email)  # Use email as identity
     return jsonify({"access_token": access_token})
 
+
 @app.route('/users', methods=['GET'])
 def get_users():
     # Query the database to retrieve user data
@@ -89,7 +102,8 @@ def get_users():
         user_data = {
             'id': user.id,
             'email': user.email,
-            'organization_id': user.organization_id
+            'organization_id': user.organization_id,
+            'organization': user.organization.title if user.organization else None
         }
         user_list.append(user_data)
 
@@ -129,12 +143,31 @@ def get_organizations():
 
 @app.route('/add-user-to-org', methods=['POST'])
 def add_user():
-    data = request.get_json()
-    new_user = User(email=data['email'], password=data['password'], organization_id=data['organization_id'])
+    try:
+        data = request.get_json()
+        user_email = data.get('email') 
+        org_title = data.get('organization')
 
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "User added!"}), 201
+        # Check if both user_email and org_id are provided
+        if not user_email or not org_title:
+            return jsonify({"error": "Both user email and organization are required"}), 400
+
+        # Check if the user and organization exist
+        user = User.query.filter_by(email=user_email).first() 
+        organization = Organization.query.filter_by(title=org_title).first()
+
+        if not user or not organization:
+            return jsonify({"error": "User or organization not found"}), 404
+
+        # Assign the user to the organization
+        user.organization = organization
+        db.session.commit()
+
+        return jsonify({"message": "User assigned to organization successfully!"}), 201
+    except Exception as e:
+        # Handle other exceptions
+        db.session.rollback()  # Rollback the transaction
+        return jsonify({"error": "An error occurred: " + str(e)}), 500
 
     
 if __name__ == '__main__':
