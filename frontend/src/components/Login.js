@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Snackbar, Alert } from '@mui/material';
+import { OrganizationContext } from './OrganizationContext';
 
 const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [open, setOpen] = useState(false)
     const [error, setError] = useState('')
+    const {refresh, setRefresh} = useContext(OrganizationContext)
+    const [current, setCurrent] = useState('')
 
     const navigate = useNavigate()
 
@@ -33,9 +36,10 @@ const Login = () => {
         })
 
         const data = await res.json()
+        console.log('data', data);
         if (res.status === 200) {
             const { access_token } = data;
-
+            refresh ? setRefresh(false) : setRefresh(true)
             localStorage.setItem('access_token', access_token)
             navigate('/users');
         } else {

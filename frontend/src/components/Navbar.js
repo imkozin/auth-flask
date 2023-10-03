@@ -55,7 +55,7 @@ function Navbar(props) {
             <ListItem disablePadding>
               <ListItemButton sx={{ textAlign: 'center' }}>
                 <Link
-                  to={'/form'}
+                  to={'/orgs'}
                   style={{ textDecoration: 'none', color: 'inherit' }}
                 >
                   <ListItemText primary="Organization" />
@@ -148,7 +148,7 @@ function Navbar(props) {
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {isLoggedIn ? (
               <>
-                <Button component={Link} to={'/form'} sx={{ color: '#fff' }}>
+                <Button component={Link} to={'/orgs'} sx={{ color: '#fff' }}>
                   Organization
                 </Button>
                 <Button component={Link} to={'/users'} sx={{ color: '#fff' }}>

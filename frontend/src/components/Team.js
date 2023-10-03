@@ -1,40 +1,66 @@
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
+import { Button, Alert, Snackbar } from '@mui/material';
 import { TeamContext } from "./TeamContext";
 import { OrganizationContext } from "./OrganizationContext";
 
 const Team = () => {
     const {users, setUsers} = useContext(TeamContext);
     const { organizations, setOrganizations, refresh, setRefresh } =
-      useContext(OrganizationContext)
-    //  const [value, setValue] = useState('')
-    //  const [error, setError] = useState(false)
-    //  const [helperText, setHelperText] = useState('Choose wisely')
+      useContext(OrganizationContext);
+    const [employee, setEmployee] = useState('');
+    const [org, setOrg] = useState('');
+    const [open, setOpen] = useState(false);
+    const [success, setSuccess] = useState(false)
 
-    //  const handleRadioChange = (event) => {
-    //    setValue(event.target.value)
-    //    setHelperText(' ')
-    //    setError(false)
-    //  }
+    const current = localStorage.getItem('email')
 
-    //  const handleSubmit = (event) => {
-    //    event.preventDefault()
+    const handleClick = () => {
+      setOpen(true)
+    }
 
-    //    if (value === 'best') {
-    //      setHelperText('You got it!')
-    //      setError(false)
-    //    } else if (value === 'worst') {
-    //      setHelperText('Sorry, wrong answer!')
-    //      setError(true)
-    //    } else {
-    //      setHelperText('Please select an option.')
-    //      setError(true)
-    //    }
-    //  }
+    const handleClose = (event, reason) => {
+      if (reason === 'clickaway') {
+        return
+      }
+      setOpen(false)
+    }
+  
+    const handleSubmit = async (e) => {
+      e.preventDefault()
+      const res = await fetch('/add-user-to-org', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: employee, organization: org }),
+      })
 
+      if (res.status === 201) {
+        refresh ? setRefresh(false) : setRefresh(true)
+        setSuccess(true)
+        handleClick()
+      } else {
+        console.error('Failed to assign user to organization:', res.status)
+      }
+    }
+
+    const handleDelete = async (id) => {
+      const res = await fetch(`/remove-user-from-org/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (res.status === 200) {
+        refresh ? setRefresh(false) : setRefresh(true)
+      } else {
+        console.error('Failed to remove user from organization:', res.status)
+      }
+    }
 
   const filteredUsers = users.filter(user => user.organization === null)
   console.log(filteredUsers);
   const assignedUsers = users.filter(user => user.organization !== null)
+  console.log(assignedUsers);
+  console.log('users', users);
 
   return (
     <section className="text-gray-600 body-font">
@@ -45,8 +71,10 @@ const Team = () => {
               Meet our team
             </h2>
             <p className="mt-6 text-lg leading-8 text-gray-600">
-              Libero fames augue nisl porttitor nisi, quis. Id ac elit odio
-              vitae elementum enim vitae ullamcorper suspendisse.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit,
+              rem culpa dolor aliquid neque quidem commodi rerum atque libero
+              molestiae, perspiciatis quia dolore accusantium magni, reiciendis
+              odio corporis laborum. Ad.
             </p>
           </div>
           <ul
@@ -85,27 +113,46 @@ const Team = () => {
           </h1>
 
           <p className="lg:w-2/3 mx-auto leading-relaxed text-base mb-4">
-            Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical
-            gentrify, subway tile poke farm-to-table. Franzen you probably
-            haven't heard of them.
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+            Exercitationem perferendis porro voluptate quaerat magnam officia.
+            Voluptas, nesciunt sed totam consequatur beatae quaerat inventore
+            sequi dicta, vero quisquam explicabo maiores eligendi?
           </p>
-          <form className="flex items-center justify-center gap-x-10">
+          {success && (
+            <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
+              <Alert
+                onClose={handleClose}
+                severity="success"
+                sx={{ width: '100%' }}
+              >
+                User assigned to Organization!
+              </Alert>
+            </Snackbar>
+          )}
+          <form
+            onSubmit={handleSubmit}
+            className="flex items-center justify-center gap-x-10"
+          >
             <div className="sm:col-span-3">
               <label
-                htmlFor="country"
+                htmlFor="employee"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
                 Employee
               </label>
               <div className="mt-2">
                 <select
-                  id="country"
-                  name="country"
-                  autoComplete="country-name"
+                  id="employee"
+                  name="employee"
+                  autoComplete="employee-name"
+                  value={employee}
+                  onChange={(e) => setEmployee(e.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 >
                   {users.map((user) => (
-                    <option key={user.id}>{user.email}</option>
+                    <option value={user.email} key={user.id}>
+                      {user.email}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -113,20 +160,24 @@ const Team = () => {
 
             <div className="sm:col-span-3">
               <label
-                htmlFor="country"
+                htmlFor="organization"
                 className="block text-sm font-medium leading-6 text-gray-900"
               >
                 Organization
               </label>
               <div className="mt-2">
                 <select
-                  id="country"
-                  name="country"
-                  autoComplete="country-name"
+                  id="organization"
+                  name="organization"
+                  autoComplete="organization-name"
+                  value={org}
+                  onChange={(e) => setOrg(e.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 >
-                  {users.map((user) => (
-                    <option key={user.id}>{user.organization}</option>
+                  {organizations.map((org) => (
+                    <option value={org.title} key={org.id}>
+                      {org.title}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -134,6 +185,7 @@ const Team = () => {
             <div className="mt-7 flex items-center gap-x-6">
               <button
                 type="submit"
+                onClick={handleClick}
                 className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
               >
                 Save
@@ -148,7 +200,7 @@ const Team = () => {
                 <img
                   alt="team"
                   className="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4"
-                  src="https://dummyimage.com/90x90"
+                  src={`https://i.pravatar.cc/150?img=${user.id}`}
                 />
                 <div className="flex-grow">
                   <h2 className="text-gray-900 title-font font-medium">
@@ -156,6 +208,13 @@ const Team = () => {
                   </h2>
                   <p className="text-gray-500">{user.organization}</p>
                 </div>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => handleDelete(user.id)}
+                >
+                  Remove
+                </Button>
               </div>
             </div>
           ))}

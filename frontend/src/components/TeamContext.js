@@ -1,9 +1,11 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { OrganizationContext } from "./OrganizationContext";
 
 export const TeamContext = createContext();
 
 const TeamProvider = ({children}) => {
     const [users, setUsers] = useState([{}]);
+    const { refresh } = useContext(OrganizationContext);
 
     useEffect(() => {
       const getUsers = async () => {
@@ -22,7 +24,7 @@ const TeamProvider = ({children}) => {
       }
 
       getUsers()
-    }, [])
+    }, [refresh])
 
     return (
         <TeamContext.Provider value={{users, setUsers}}>

@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from sqlalchemy import text
 from dotenv import load_dotenv
 import os
+import re
 
 # Load environment variables from .env file
 load_dotenv()
@@ -59,6 +60,7 @@ migrate = Migrate(app, db)
 
 jwt = JWTManager(app)
 
+regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -68,11 +70,15 @@ def signup():
     if user_exists:
         return jsonify({"error": "Email is already registered"}), 400
 
-    hashed_password = generate_password_hash(data['password'], method='sha256')
-    new_user = User(email=data['email'], password=hashed_password)  # Modified here
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "User registered successfully"}), 200
+    if re.fullmatch(regex, data['email']):
+        hashed_password = generate_password_hash(data['password'], method='sha256')
+        new_user = User(email=data['email'], password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"message": "User registered successfully"}), 200
+    else:
+        return jsonify({"error": "Invalid Email"}), 400
+    
 
 @app.route('/signin', methods=['POST'])
 def signin():
@@ -88,7 +94,8 @@ def signin():
     if not check_password_hash(user.password, data['password']):
         return jsonify({"error": "Invalid credentials!"}), 401
     access_token = create_access_token(identity=user.email)  # Use email as identity
-    return jsonify({"access_token": access_token})
+    email = user.email
+    return jsonify({"email": email,"access_token": access_token})
 
 
 @app.route('/users', methods=['GET'])
@@ -169,6 +176,16 @@ def add_user():
         db.session.rollback()  # Rollback the transaction
         return jsonify({"error": "An error occurred: " + str(e)}), 500
 
+@app.route('/remove-user-from-org/<int:id>', methods=['DELETE'])
+def remove_user(id):
+    user = User.query.get(id)
+
+    if user is not None:
+        user.organization = None
+        db.session.commit()
+        return jsonify({"message": "User removed from organization successfully!"}), 200
+    else:
+        return jsonify({"message": "User not found"}), 404
     
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

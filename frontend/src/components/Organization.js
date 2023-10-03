@@ -83,10 +83,7 @@ function Organization() {
                 Create new organization
               </h1>
               <p className="mb-8 leading-relaxed">
-                Kickstarter biodiesel roof party wayfarers cold-pressed. Palo
-                santo live-edge tumeric scenester copper mug flexitarian. Prism
-                vice offal plaid everyday carry. Gluten-free chia VHS squid
-                listicle artisan.
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Assumenda culpa, nobis possimus, dolor, nihil nemo vel incidunt perferendis natus pariatur voluptatibus doloribus veniam fuga quaerat ab sequi. Voluptas, cum eaque.
               </p>
               <div className="flex w-full justify-center items-end">
                 <div className="relative mr-4 lg:w-full xl:w-1/2 w-2/4 md:w-full text-left">
@@ -120,15 +117,16 @@ function Organization() {
                 Our organizations
               </h1>
               <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
-                Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical
-                gentrify, subway tile poke farm-to-table. Franzen you probably
-                haven't heard of them.
+                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ex non doloribus veniam eum, porro incidunt praesentium accusamus eius error numquam dolor saepe quia cumque a similique quos expedita explicabo adipisci?
               </p>
             </div>
             <div className="flex flex-wrap -m-4">
               {organizations.map((org) => {
                 return (
-                  <div key={org.id} className="p-4 lg:w-1/4 md:w-1/2">
+                  <div
+                    key={org.id}
+                    className="p-4 lg:w-1/4 md:w-1/2 sm:w-full mx-auto text-center"
+                  >
                     <div className="h-full flex flex-col items-center text-center">
                       <img
                         alt="team"
@@ -164,9 +162,7 @@ function Organization() {
                             ))
                           ) : (
                             <p className="text-gray-600 mb-2">
-                              <span >
-                                No employees yet
-                              </span>
+                              <span>No employees yet</span>
                             </p>
                           )}
                         </div>
@@ -179,7 +175,7 @@ function Organization() {
                         Delete
                       </Button>
                     </div>
-                  </div> 
+                  </div>
                 ) 
               })}
             </div>
