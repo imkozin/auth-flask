@@ -97,6 +97,17 @@ def signin():
     email = user.email
     return jsonify({"email": email,"access_token": access_token})
 
+@app.route('/delete-user/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    user = User.query.get(id)
+
+    if user is not None:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"message": "Organization deleted successfully!"}), 200
+    else:
+        return jsonify({"message": "Organization not found"}), 404
+
 
 @app.route('/users', methods=['GET'])
 def get_users():

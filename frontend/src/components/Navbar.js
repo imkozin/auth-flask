@@ -14,6 +14,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import { Stack } from '@mui/material'
 
 const drawerWidth = 240
 
@@ -21,18 +22,23 @@ function Navbar(props) {
   const { window } = props
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [current, setCurrent] = useState('')
 
   const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
     const token = localStorage.getItem('access_token')
+    const email = localStorage.getItem('email')
+    console.log('email', email);
     console.log('Token:', token)
+    setCurrent(email)
     token ? setIsLoggedIn(true) : setIsLoggedIn(false)
   }, [location])
 
   const handleLogout = () => {
     localStorage.removeItem('access_token')
+    localStorage.removeItem('email')
     setIsLoggedIn(false)
     navigate('/login')
   }
@@ -52,6 +58,11 @@ function Navbar(props) {
       <List>
         {isLoggedIn ? (
           <>
+            <ListItem disablePadding>
+              <ListItemButton sx={{ textAlign: 'center' }}>
+                <ListItemText primary={current} />
+              </ListItemButton>
+            </ListItem>
             <ListItem disablePadding>
               <ListItemButton sx={{ textAlign: 'center' }}>
                 <Link
@@ -147,19 +158,27 @@ function Navbar(props) {
           </Typography>
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {isLoggedIn ? (
-              <>
+              <Stack spacing={2} direction="row">
+                <Button disabled>
+                  {current}
+                </Button>
                 <Button component={Link} to={'/orgs'} sx={{ color: '#fff' }}>
                   Organization
                 </Button>
-                <Button component={Link} to={'/users'} sx={{ color: '#fff' }}>
+                <Button
+                  component={Link}
+                  to={'/users'}
+                  sx={{ color: '#fff' }}
+                  color="primary"
+                >
                   Team
                 </Button>
                 <Button onClick={handleLogout} sx={{ color: '#fff' }}>
                   Logout
                 </Button>
-              </>
+              </Stack>
             ) : (
-              <>
+              <Stack spacing={2} direction="row">
                 <Button component={Link} to={'/'} sx={{ color: '#fff' }}>
                   Home
                 </Button>
@@ -173,7 +192,7 @@ function Navbar(props) {
                 >
                   Register
                 </Button>
-              </>
+              </Stack>
             )}
           </Box>
         </Toolbar>

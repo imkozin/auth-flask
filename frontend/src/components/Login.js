@@ -10,7 +10,6 @@ const Login = () => {
     const [open, setOpen] = useState(false)
     const [error, setError] = useState('')
     const {refresh, setRefresh} = useContext(OrganizationContext)
-    const [current, setCurrent] = useState('')
 
     const navigate = useNavigate()
 
@@ -38,9 +37,10 @@ const Login = () => {
         const data = await res.json()
         console.log('data', data);
         if (res.status === 200) {
-            const { access_token } = data;
+            const { access_token, email } = data;
             refresh ? setRefresh(false) : setRefresh(true)
             localStorage.setItem('access_token', access_token)
+            localStorage.setItem('email', email)
             navigate('/users');
         } else {
             setError(data.error)

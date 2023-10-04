@@ -1,11 +1,11 @@
-import { useEffect, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { Button, Alert, Snackbar } from '@mui/material';
 import { TeamContext } from "./TeamContext";
 import { OrganizationContext } from "./OrganizationContext";
 
 const Team = () => {
-    const {users, setUsers} = useContext(TeamContext);
-    const { organizations, setOrganizations, refresh, setRefresh } =
+    const {users } = useContext(TeamContext);
+    const { organizations, refresh, setRefresh } =
       useContext(OrganizationContext);
     const [employee, setEmployee] = useState('');
     const [org, setOrg] = useState('');
@@ -35,6 +35,9 @@ const Team = () => {
         body: JSON.stringify({ email: employee, organization: org }),
       })
 
+      console.log('emp', employee)
+      console.log('org', org)
+    
       if (res.status === 201) {
         refresh ? setRefresh(false) : setRefresh(true)
         setSuccess(true)
@@ -44,7 +47,7 @@ const Team = () => {
       }
     }
 
-    const handleDelete = async (id) => {
+    const handleRemove = async (id) => {
       const res = await fetch(`/remove-user-from-org/${id}`, {
         method: 'DELETE'
       })
@@ -52,7 +55,20 @@ const Team = () => {
       if (res.status === 200) {
         refresh ? setRefresh(false) : setRefresh(true)
       } else {
-        console.error('Failed to remove user from organization:', res.status)
+        console.error('Failed to remove user from organization', res.status)
+      }
+    }
+
+
+    const handleDelete = async (id) => {
+      const res = await fetch(`/delete-user/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (res.status === 200) {
+        refresh ? setRefresh(false) : setRefresh(true)
+      } else {
+        console.error('Failed to delete user', res.status)
       }
     }
 
@@ -78,7 +94,6 @@ const Team = () => {
             </p>
           </div>
           <ul
-            role="list"
             className="grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2"
           >
             {filteredUsers.map((user) => (
@@ -99,6 +114,14 @@ const Team = () => {
                         : 'No Organization'}
                     </p>
                   </div>
+                  {current !== user.email ? (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => handleDelete(user.id)}
+                  >
+                    Delete
+                  </Button>) : (<>Logged In</>)}
                 </div>
               </li>
             ))}
@@ -149,7 +172,8 @@ const Team = () => {
                   onChange={(e) => setEmployee(e.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 >
-                  {users.map((user) => (
+                  <option value="">Choose employee</option>
+                  {filteredUsers.map((user) => (
                     <option value={user.email} key={user.id}>
                       {user.email}
                     </option>
@@ -174,6 +198,7 @@ const Team = () => {
                   onChange={(e) => setOrg(e.target.value)}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:max-w-xs sm:text-sm sm:leading-6"
                 >
+                  <option value="">Choose organization</option>
                   {organizations.map((org) => (
                     <option value={org.title} key={org.id}>
                       {org.title}
@@ -211,7 +236,7 @@ const Team = () => {
                 <Button
                   variant="contained"
                   color="error"
-                  onClick={() => handleDelete(user.id)}
+                  onClick={() => handleRemove(user.id)}
                 >
                   Remove
                 </Button>
