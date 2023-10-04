@@ -5,6 +5,7 @@ export const OrganizationContext = createContext()
 const OrganizationProvider = ({children}) => {
     const [organizations, setOrganizations] = useState([{}]);
     const [refresh, setRefresh] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
 
     useEffect(() => {
       const getOrganizations = async () => {
@@ -26,7 +27,7 @@ const OrganizationProvider = ({children}) => {
     }, [refresh])
 
     return (
-        <OrganizationContext.Provider value={{organizations, setOrganizations, refresh, setRefresh}}>
+        <OrganizationContext.Provider value={{organizations, setOrganizations, refresh, setRefresh, isLoggedIn, setIsLoggedIn}}>
             {children}
         </OrganizationContext.Provider>
     )

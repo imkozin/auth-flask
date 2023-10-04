@@ -1,82 +1,92 @@
-import { useContext, useState } from "react";
-import { Button, Alert, Snackbar } from '@mui/material';
-import { TeamContext } from "./TeamContext";
-import { OrganizationContext } from "./OrganizationContext";
+import { useContext, useState, useEffect } from 'react'
+import { Button, Alert, Snackbar } from '@mui/material'
+import { TeamContext } from '../components/TeamContext'
+import { OrganizationContext } from '../components/OrganizationContext'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const Team = () => {
-    const {users } = useContext(TeamContext);
-    const { organizations, refresh, setRefresh } =
-      useContext(OrganizationContext);
-    const [employee, setEmployee] = useState('');
-    const [org, setOrg] = useState('');
-    const [open, setOpen] = useState(false);
-    const [success, setSuccess] = useState(false)
+  const { users } = useContext(TeamContext)
+  const { organizations, refresh, setRefresh, setIsLoggedIn } = useContext(OrganizationContext)
+  const [employee, setEmployee] = useState('')
+  const [org, setOrg] = useState('')
+  const [open, setOpen] = useState(false)
+  const [success, setSuccess] = useState(false)
 
-    const current = localStorage.getItem('email')
+  const navigate = useNavigate()
+  const location = useLocation()
 
-    const handleClick = () => {
-      setOpen(true)
+  useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    if (!token) {
+      setIsLoggedIn(false)
+      navigate('/404')
     }
+  }, [location])
 
-    const handleClose = (event, reason) => {
-      if (reason === 'clickaway') {
-        return
-      }
-      setOpen(false)
+  const current = localStorage.getItem('email')
+
+  const handleClick = () => {
+    setOpen(true)
+  }
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return
     }
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault()
-      const res = await fetch('/add-user-to-org', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: employee, organization: org }),
-      })
+    setOpen(false)
+  }
 
-      console.log('emp', employee)
-      console.log('org', org)
-    
-      if (res.status === 201) {
-        refresh ? setRefresh(false) : setRefresh(true)
-        setSuccess(true)
-        handleClick()
-      } else {
-        console.error('Failed to assign user to organization:', res.status)
-      }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const res = await fetch('/add-user-to-org', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: employee, organization: org }),
+    })
+
+    console.log('emp', employee)
+    console.log('org', org)
+
+    if (res.status === 201) {
+      refresh ? setRefresh(false) : setRefresh(true)
+      setSuccess(true)
+      handleClick()
+    } else {
+      console.error('Failed to assign user to organization:', res.status)
     }
+  }
 
-    const handleRemove = async (id) => {
-      const res = await fetch(`/remove-user-from-org/${id}`, {
-        method: 'DELETE'
-      })
+  const handleRemove = async (id) => {
+    const res = await fetch(`/remove-user-from-org/${id}`, {
+      method: 'DELETE',
+    })
 
-      if (res.status === 200) {
-        refresh ? setRefresh(false) : setRefresh(true)
-      } else {
-        console.error('Failed to remove user from organization', res.status)
-      }
+    if (res.status === 200) {
+      refresh ? setRefresh(false) : setRefresh(true)
+    } else {
+      console.error('Failed to remove user from organization', res.status)
     }
+  }
 
+  const handleDelete = async (id) => {
+    const res = await fetch(`/delete-user/${id}`, {
+      method: 'DELETE',
+    })
 
-    const handleDelete = async (id) => {
-      const res = await fetch(`/delete-user/${id}`, {
-        method: 'DELETE'
-      })
-
-      if (res.status === 200) {
-        refresh ? setRefresh(false) : setRefresh(true)
-      } else {
-        console.error('Failed to delete user', res.status)
-      }
+    if (res.status === 200) {
+      refresh ? setRefresh(false) : setRefresh(true)
+    } else {
+      console.error('Failed to delete user', res.status)
     }
+  }
 
-  const filteredUsers = users.filter(user => user.organization === null)
-  console.log(filteredUsers);
-  const assignedUsers = users.filter(user => user.organization !== null)
-  console.log(assignedUsers);
-  console.log('users', users);
+  const filteredUsers = users.filter((user) => user.organization === null)
+  console.log(filteredUsers)
+  const assignedUsers = users.filter((user) => user.organization !== null)
+  console.log(assignedUsers)
+  console.log('users', users)
 
   return (
     <section className="text-gray-600 body-font">
@@ -93,9 +103,7 @@ const Team = () => {
               odio corporis laborum. Ad.
             </p>
           </div>
-          <ul
-            className="grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2"
-          >
+          <ul className="grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
             {filteredUsers.map((user) => (
               <li key={user.id}>
                 <div className="flex items-center gap-x-6">
@@ -115,13 +123,16 @@ const Team = () => {
                     </p>
                   </div>
                   {current !== user.email ? (
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleDelete(user.id)}
-                  >
-                    Delete
-                  </Button>) : (<>Logged In</>)}
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      Delete
+                    </Button>
+                  ) : (
+                    <>Logged In</>
+                  )}
                 </div>
               </li>
             ))}
@@ -248,6 +259,5 @@ const Team = () => {
     </section>
   )
 }
-
 
 export default Team;
