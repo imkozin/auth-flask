@@ -1,5 +1,5 @@
 # Manager Web Assistant
-![Logo](logo.jpeg)
+![Logo](./images/logo.jpeg)
 
 ## Table of Contents
 - [Description](#desciption)
