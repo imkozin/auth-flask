@@ -1,5 +1,5 @@
 # Manager Web Assistant
-<img width="150" alt="logo" src="https://github.com/imkozin/auth-flask/frontend/public/logo.jpeg">
+![Logo](logo.jpeg)
 
 ## Table of Contents
 - [Description](#desciption)
