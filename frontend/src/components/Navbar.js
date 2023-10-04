@@ -60,7 +60,7 @@ function Navbar(props) {
           <>
             <ListItem disablePadding>
               <ListItemButton sx={{ textAlign: 'center' }}>
-                <ListItemText primary={current} />
+                <ListItemText primary={current} disabled />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
@@ -77,7 +77,10 @@ function Navbar(props) {
               <ListItemButton sx={{ textAlign: 'center' }}>
                 <Link
                   to={'/users'}
-                  style={{ textDecoration: 'none', color: 'inherit' }}
+                  style={{
+                    textDecoration: 'none',
+                    color: 'inherit'
+                  }}
                 >
                   <ListItemText primary="Team" />
                 </Link>

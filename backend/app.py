@@ -70,14 +70,17 @@ def signup():
     if user_exists:
         return jsonify({"error": "Email is already registered"}), 400
 
-    if re.fullmatch(regex, data['email']):
-        hashed_password = generate_password_hash(data['password'], method='sha256')
-        new_user = User(email=data['email'], password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify({"message": "User registered successfully"}), 200
-    else:
+    if not re.fullmatch(regex, data['email']):
         return jsonify({"error": "Invalid Email"}), 400
+    
+    if len(data['password']) < 6:
+        return jsonify({"error": "Invalid Password"}), 400
+    
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+    new_user = User(email=data['email'], password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "User registered successfully"}), 200
     
 
 @app.route('/signin', methods=['POST'])
