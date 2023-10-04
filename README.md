@@ -130,7 +130,10 @@ We welcome contributions from the community! Feel free to report issues, suggest
 ![Signin](./images/signin.png)
 ![Org](./images/org.png)
 ![Team](./images/user.png)
-![Menu](./images/menu-mob.png | width=200)
-![Signup](./images/signup-mob.png | width=200)
-![OrgMob](./images/org-mob.png | width=200)
-![TeamMob](./images/user-mob.png | width=200)
+![Menu](./images/menu-mob.png)
+![Signup](./images/signup-mob.png)
+![OrgMob](./images/org-mob.png)
+![TeamMob](./images/user-mob.png)
+
+## Video Review
+You can check the video review of the web site [here](https://www.loom.com/share/7bbce5f1603140079720d79eaf026c2c)
