@@ -43,8 +43,6 @@ function Navbar(props) {
     navigate('/login')
   }
 
-
-
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState)
   }

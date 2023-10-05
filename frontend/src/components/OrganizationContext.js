@@ -4,8 +4,8 @@ export const OrganizationContext = createContext()
 
 const OrganizationProvider = ({children}) => {
     const [organizations, setOrganizations] = useState([{}]);
-    const [refresh, setRefresh] = useState(false)
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [refresh, setRefresh] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
       const getOrganizations = async () => {

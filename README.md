@@ -8,8 +8,8 @@
 - [Usage](#usage)
 - [Possible Improvements](#possible-improvements)
 - [Contribute](#contribute)
-- [Overview](#overview)
 - [Video Review](#video-review)
+- [Overview](#overview)
 
 ## Description
 
@@ -125,6 +125,9 @@ This will launch the development server, and your React application will be avai
 ## Contribute
 We welcome contributions from the community! Feel free to report issues, suggest enhancements, or submit pull requests to help us improve this application.
 
+## Video Review
+You can check the video review of the web site [here](https://www.loom.com/share/e874ff5d97b44bc098b8db3eba8a79db)
+
 ## Overview
 ![Start](./images/start.png)
 ![Signin](./images/signin.png)
@@ -135,5 +138,3 @@ We welcome contributions from the community! Feel free to report issues, suggest
 ![OrgMob](./images/org-mob.png)
 ![TeamMob](./images/user-mob.png)
 
-## Video Review
-You can check the video review of the web site [here](https://www.loom.com/share/7bbce5f1603140079720d79eaf026c2c)

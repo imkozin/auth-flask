@@ -32,18 +32,6 @@ def test_db_connection():
 
 
 # class represent a table in database
-# class User(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     email = db.Column(db.String(80), unique=True, nullable=False)
-#     password = db.Column(db.String(1000), nullable=False)
-#     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=True)
-#     organization = db.relationship('Organization', backref='employees')
-
-# class Organization(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     title = db.Column(db.String(100), unique=True, nullable=False)
-#     employees = db.relationship(User, backref='organization', lazy=True, cascade='save-update')
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), unique=True, nullable=False)
